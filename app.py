@@ -21,7 +21,6 @@ def get_image():
     key = request.headers.get("x-api-key")
     secret = request.headers.get("x-api-secret")
 
-    # Check both key and secret
     if key != os.environ.get("API_KEY") or secret != os.environ.get("API_SECRET"):
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -29,15 +28,21 @@ def get_image():
     if not filename:
         return jsonify({"error": "No filename provided"}), 400
 
-    blob = bucket.blob(f"annotated/{filename}")
-    if not blob.exists():
-        return jsonify({"error": "File not found"}), 404
+    try:
+        blob = bucket.blob(f"annotated/{filename}")
+        if not blob.exists():
+            return jsonify({"error": "File not found"}), 404
 
-    url = get_signed_url(f"annotated/{filename}")
-    return jsonify({"image_url": url})
+        url = get_signed_url(f"annotated/{filename}")
+        return jsonify({"image_url": url})
+    except Exception as e:
+        # Return the actual error for debugging
+        return jsonify({"error": str(e)}), 500
+
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
+
 
