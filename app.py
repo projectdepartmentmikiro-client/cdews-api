@@ -2,6 +2,9 @@ import os
 from flask import Flask, request, jsonify
 from google.cloud import storage
 
+# Debug: see what secrets are available
+print("[INFO] Secrets directory contents:", os.listdir("/opt/render/project/secrets"))
+
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 API_KEY = os.environ.get("API_KEY")
 API_SECRET = os.environ.get("API_SECRET")
