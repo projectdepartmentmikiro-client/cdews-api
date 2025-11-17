@@ -1,24 +1,23 @@
 import os
+import json
 from flask import Flask, request, jsonify
 from google.cloud import storage
 
-SERVICE_KEY_JSON = "service.json"  # keep your service account JSON in the repo
-BUCKET_NAME = "recieved_images-bucket"
-API_KEY = "AKIA5FJ2QPLM7XN9T8QZSK:sk-proj-MjA3QlBqR1lqU1ZJTXp4TkpvQW5nSG9KVmQ2R3EyQ2x"
+service_account_info = json.loads(os.environ["GOOGLE_SERVICE_JSON"])
+BUCKET_NAME = os.environ["BUCKET_NAME"]
+API_KEY = os.environ["API_KEY"]
 
-client = storage.Client.from_service_account_json(SERVICE_KEY_JSON)
+client = storage.Client.from_service_account_info(service_account_info)
 bucket = client.bucket(BUCKET_NAME)
 
 app = Flask(__name__)
 
 def get_signed_url(blob_name, expiration=3600):
-    """Generate signed URL for a blob in the bucket."""
     blob = bucket.blob(blob_name)
     return blob.generate_signed_url(version="v4", expiration=expiration, method="GET")
 
 @app.route("/get-image", methods=["GET"])
 def get_image():
-    """Fetch image URL if API key is valid."""
     key = request.headers.get("x-api-key")
     if key != API_KEY:
         return jsonify({"error": "Unauthorized"}), 401
