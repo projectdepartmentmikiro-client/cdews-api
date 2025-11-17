@@ -2,19 +2,11 @@ import os
 from flask import Flask, request, jsonify
 from google.cloud import storage
 
-# ----------------------------
-# Configuration
-# ----------------------------
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 API_KEY = os.environ.get("API_KEY")
 API_SECRET = os.environ.get("API_SECRET")
-
-# Path to Render secret file (service account JSON)
 SERVICE_ACCOUNT_FILE = "/opt/render/project/secrets/service-account.json"
 
-# ----------------------------
-# Initialize Google Cloud Storage
-# ----------------------------
 try:
     client = storage.Client.from_service_account_json(SERVICE_ACCOUNT_FILE)
     bucket = client.bucket(BUCKET_NAME)
@@ -23,14 +15,8 @@ except Exception as e:
     print(f"[ERROR] Failed to initialize GCS client: {e}")
     raise
 
-# ----------------------------
-# Initialize Flask
-# ----------------------------
 app = Flask(__name__)
 
-# ----------------------------
-# Helper function: signed URL
-# ----------------------------
 def get_signed_url(blob_name, expiration=3600):
     try:
         blob = bucket.blob(blob_name)
@@ -41,15 +27,11 @@ def get_signed_url(blob_name, expiration=3600):
         print(f"[ERROR] Failed to generate signed URL for {blob_name}: {e}")
         raise
 
-# ----------------------------
-# Routes
-# ----------------------------
 @app.route("/get-image", methods=["GET"])
 def get_image():
     key = request.headers.get("x-api-key")
     secret = request.headers.get("x-api-secret")
 
-    # Validate API key and secret
     if key != API_KEY or secret != API_SECRET:
         print(f"[WARN] Unauthorized access attempt: key={key}, secret={secret}")
         return jsonify({"error": "Unauthorized"}), 401
@@ -71,13 +53,9 @@ def get_image():
         return jsonify({"image_url": url})
 
     except Exception as e:
-        # Debug output for Render logs
         print(f"[ERROR] Exception in /get-image: {e}")
         return jsonify({"error": str(e)}), 500
 
-# ----------------------------
-# Run Flask
-# ----------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"[INFO] Starting Flask on port {port}")
