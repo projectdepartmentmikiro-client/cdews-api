@@ -26,11 +26,12 @@ def get_image():
     if not filename:
         return jsonify({"error": "No filename provided"}), 400
 
-    blob = bucket.blob(f"uploads/{filename}")
+    blob_path = f"annotated/{filename}"
+    blob = bucket.blob(blob_path)
     if not blob.exists():
         return jsonify({"error": "File not found"}), 404
 
-    url = get_signed_url(f"uploads/{filename}")
+    url = get_signed_url(blob_path)
     return jsonify({"image_url": url})
 
 if __name__ == "__main__":
