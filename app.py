@@ -2,13 +2,16 @@ import os
 from flask import Flask, request, jsonify
 from google.cloud import storage
 
-# Debug: see what secrets are available
-print("[INFO] Secrets directory contents:", os.listdir("/opt/render/project/secrets"))
-
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 API_KEY = os.environ.get("API_KEY")
 API_SECRET = os.environ.get("API_SECRET")
 SERVICE_ACCOUNT_FILE = "/opt/render/project/secrets/service_account.json"
+
+# Only print secrets directory if it exists
+if os.path.exists("/opt/render/project/secrets"):
+    print("[INFO] Secrets directory contents:", os.listdir("/opt/render/project/secrets"))
+else:
+    print("[WARN] Secrets directory not found")
 
 client = storage.Client.from_service_account_json(SERVICE_ACCOUNT_FILE)
 bucket = client.bucket(BUCKET_NAME)
