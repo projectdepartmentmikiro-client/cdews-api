@@ -5,7 +5,7 @@ from google.cloud import storage
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 API_KEY = os.environ.get("API_KEY")
 API_SECRET = os.environ.get("API_SECRET")
-SERVICE_ACCOUNT_FILE = "/opt/render/project/secrets/service-account.json"
+SERVICE_ACCOUNT_FILE = "/opt/render/project/secrets/service_account.json"
 
 try:
     client = storage.Client.from_service_account_json(SERVICE_ACCOUNT_FILE)
@@ -60,3 +60,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     print(f"[INFO] Starting Flask on port {port}")
     app.run(host="0.0.0.0", port=port)
+
