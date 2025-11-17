@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from google.cloud import storage
 
 SERVICE_KEY_JSON = "service.json"
-BUCKET_NAME = "YOUR_BUCKET_NAME"
+BUCKET_NAME = "recieved_images-bucket"
 API_KEY = "AKIA5FJ2QPLM7XN9T8QZSK:sk-proj-MjA3QlBqR1lqU1ZJTXp4TkpvQW5nSG9KVmQ2R3EyQ2x"
 
 client = storage.Client.from_service_account_json(SERVICE_KEY_JSON)
@@ -38,3 +38,4 @@ def get_image():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
+
