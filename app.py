@@ -19,7 +19,10 @@ def get_signed_url(blob_name, expiration=3600):
 @app.route("/get-image", methods=["GET"])
 def get_image():
     key = request.headers.get("x-api-key")
-    if key != API_KEY:
+    secret = request.headers.get("x-api-secret")
+
+    # Check both key and secret
+    if key != os.environ.get("API_KEY") or secret != os.environ.get("API_SECRET"):
         return jsonify({"error": "Unauthorized"}), 401
 
     filename = request.args.get("filename")
@@ -33,6 +36,8 @@ def get_image():
     url = get_signed_url(f"annotated/{filename}")
     return jsonify({"image_url": url})
 
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
+
